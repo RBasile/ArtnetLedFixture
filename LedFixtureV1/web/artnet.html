@@ -1,0 +1,155 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=0.8 user-scalable=no">
+<meta charset="UTF-8">
+<title>LED #£FixName£#</title>
+
+<link href="css.css" rel="stylesheet" type="text/css">
+<link rel="ICON" type="image" href="http://rbwork.fr/img/Icone.ico" />
+<script src="../html5kellycolorpicker.min.js"></script>
+</head>
+<body>
+<a href="/color" class="button back">Color</a>
+<a href="/rainbow" class="button back" style="top: 100px;">Rainbow</a>
+<section>
+<h1>IP #£FixName£#</h1>
+</section>
+<section>
+<div class="block">
+<div class="block">
+  <h1>Network Name</h1>
+  <input id="ssidname" class="imputT" maxlength="20" type="text" value="#ssid#"></div>
+<div class="block">
+  <h1>Password</h1>
+  <input id="pass" class="imputT" maxlength="30" type="text" value="#password#"></div>
+</div>
+</section>
+
+<section>
+<div class="block">
+<a id="DHCP" onclick="DHCP(this)" class="button">DHCP</a><a id="IPfix" onclick="DHCP(this)" class="button">IP Fix</a>
+</div>
+</section>
+<section>
+<div class="block">
+  <h1>IP</h1>
+  <input id="ip" class="imputT" type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" value="#WiFi.localIP().toString()#"></div>
+<div class="block">
+  <h1>Mask</h1>
+  <input id="mask" class="imputT" type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" value="#WiFi.subnetMask().toString()#"></div>
+<div class="block">
+  <h1>Gateway</h1>
+  <input id="gateway" class="imputT" type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" value="#WiFi.gatewayIP().toString()#"></div>
+</section>
+
+<h1>Universe</h1>
+  <input id="univ" class="imputT" type="number" min="0" max="511" value="#String(startUniverse)#">
+</div>
+<div class="block">
+    <h1>brightness</h1>
+    <input oninput="chgBright()" class="slider" id="bright" type="range" min="0" max="255" value="#String(Bright)#" step="1"><br><h1 id="brightV"> #£String(Bright)£#</h1>
+</div>
+<section>
+  <a onclick="startSi()" class="button">Save Config</a></div>
+</section>
+<br>
+<br>
+<section>
+  <a onclick="LockDown()" class="button">Disable HTML</a></div>
+</section>
+
+#£syncSection£#
+
+<div onclick="clearbox()" id="popbox" class="pop" style="display: none;">
+  <h2 id="poptext">Universe</h2>
+</div>
+
+
+<script type="text/javascript">
+var DHCPon = 1;
+var currentIP = String(window.location.hostname);
+
+var ssidname = document.getElementById("ssidname");
+var pass = document.getElementById("pass");
+
+var dhcp = document.getElementById("DHCP");
+var ipfix = document.getElementById("IPfix");
+
+var ip = document.getElementById("ip");
+var mask = document.getElementById("mask");
+var gateway = document.getElementById("gateway");
+var univ = document.getElementById("univ");
+var brightV = document.getElementById("brightV");
+var bright = document.getElementById("bright");
+
+var popbox = document.getElementById("popbox");
+
+function chgBright() {
+brightV.innerHTML = bright.value;
+}
+
+window.onload = function(){
+  popbox.style.display = "none";
+  if (DHCPon == 1){
+    dhcp.style.borderColor = "Orange" ;
+    ipfix.style.borderColor = "White" ;
+  }else{
+    dhcp.style.borderColor = "White" ;
+    ipfix.style.borderColor = "Orange" ;
+  }
+  console.log(currentIP);
+};
+function DHCP(dhcpsta) {
+  if (dhcpsta.id=="DHCP"){
+    DHCPon = 1;
+    dhcp.style.borderColor = "Orange";
+    ipfix.style.borderColor = "White" ;
+  }else{
+    DHCPon = 0;
+    dhcp.style.borderColor = "White" ;
+    ipfix.style.borderColor = "Orange" ;
+  }
+}
+function newIP() {popbox.style.display = "none";window.location = "http://"+ip.value;}
+function clearbox() {popbox.style.display = "none";}
+function startSi(){
+    var message = "";
+    message = "ssid="+ssidname.value;
+    message += ";pass="+pass.value;
+    message += ";dhcp=" + DHCPon;
+    message += ";ip="+ip.value;
+    message += ";mask="+ mask.value;
+    message += ";gateway="+ gateway.value;
+    message += ";univ="+ univ.value;
+    message += ";bright=" + bright.value;
+    console.log(message);
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          if (currentIP!=ip.value){
+            setTimeout(newIP, 1000);}
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+          setTimeout(clearbox, 5000);
+        };
+      };
+    
+    xhttp.open("POST","/newconf", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send(message);
+    
+}
+function LockDown(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+          
+        };
+      };
+    xhttp.open("POST","/LockDownHTML", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send("LOCKdown=yesLock");
+    
+}
+</script>
+</body></html>

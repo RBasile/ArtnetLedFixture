@@ -1,0 +1,145 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=0.8 user-scalable=no">
+<meta charset="UTF-8">
+<title>LED Circle</title>
+
+<link href="css.css" rel="stylesheet" type="text/css">
+<link rel="ICON" type="image" href="http://rbwork.fr/img/Icone.ico" />
+<style type="text/css">
+  .slider {
+  -webkit-appearance: none;
+  width: 50%;
+  height: 30px;
+  background: aliceblue;
+  outline: none;
+  opacity: 1;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+
+<section>
+<div class="block">
+  <h1>Color</h1></div>
+</section>
+<section>
+  <div class="block">
+    <h1>Red</h1>
+    <input oninput="chcolor()" class="slider" id="red" type="range" min="0" max="255" value="0"><h1 id="redV">0</h1>
+  </div>
+  <div class="block">
+    <h1>Green</h1>
+    <input oninput="chcolor()" class="slider" id="green" type="range" min="0" max="255" value="0"><h1 id="greenV">0</h1>
+  </div>
+  <div class="block">
+    <h1>Blue</h1>
+    <input oninput="chcolor()" class="slider"id="blue" type="range" min="0" max="255" value="0"><h1 id="blueV">0</h1>
+  </div>
+  <div id="colorbox" style="width: 10%;height: 60px;margin: auto;background-color: rgb(0, 0, 0);border-radius: 10px;"></div>
+</section>
+<section>
+  <h1>Strobe</h1>
+  <div class="block">
+    <h1>Freq</h1>
+    <input oninput="chstrob()" class="slider" id="strobe" type="range" min="0" max="50" value="10" step=".1"><br><h1 id="strobeV">10hz</h1>
+  </div>
+  <div class="block">
+    <h1>Duty</h1>
+    <input oninput="chstrob()" class="slider" id="duty" type="range" min="1" max="100" value="50"><br><h1 id="dutyV">50%</h1>
+  </div>
+</section>
+
+<section>
+  <a onclick="setColor()" class="button">Save color</a></div>
+</section>
+<section>
+  <a onclick="coloroff()" class="button">Disable Color</a></div>
+</section>
+<div onclick="clearbox()" id="popbox" class="pop" style="display: none;">
+  <h1 id="poptext">Universe</h1>
+</div>
+
+<script type="text/javascript">
+
+var red = document.getElementById("red");
+var green = document.getElementById("green");
+var blue = document.getElementById("blue");
+var redV = document.getElementById("redV");
+var greenV = document.getElementById("greenV");
+var blueV = document.getElementById("blueV");
+
+var strobe = document.getElementById("strobe");
+var duty = document.getElementById("duty");
+var strobeV = document.getElementById("strobeV");
+var dutyV = document.getElementById("dutyV");
+
+var popbox = document.getElementById("popbox");
+var colorbox = document.getElementById("colorbox");
+
+window.onload = function(){
+  popbox.style.display = "none";
+};
+
+function chcolor() {
+colorbox.style.backgroundColor="rgb("+red.value+", "+green.value+", "+blue.value+")";
+redV.innerHTML = red.value;
+greenV.innerHTML = green.value;
+blueV.innerHTML = blue.value;
+}
+function chstrob() {
+strobeV.innerHTML = strobe.value+"hz";
+dutyV.innerHTML = duty.value+"%";
+}
+
+function clearbox() {popbox.style.display = "none";}
+function setColor(){
+    var message = "";
+    message = "R="+red.value;
+    message += ";G="+green.value;
+    message += ";B=" + blue.value;
+    message += ";st=" + strobe.value;
+    message += ";duty=" + duty.value;
+    console.log(message);
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+          setTimeout(clearbox, 5000);
+        };
+      };
+    
+    xhttp.open("POST","http://192.168.2.100/setColor", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send(message);
+    var xhttp2 = new XMLHttpRequest();
+    xhttp2.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+          setTimeout(clearbox, 5000);
+        };
+      };
+    
+    xhttp2.open("POST","http://192.168.2.101/setColor", true);
+    xhttp2.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp2.send(message);
+    
+}
+function coloroff(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+          
+        };
+      };
+    xhttp.open("POST","/Coloroff", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send("Color=0");
+}
+</script>
+</body></html>

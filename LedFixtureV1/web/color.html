@@ -1,0 +1,135 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=0.8 user-scalable=no">
+<meta charset="UTF-8">
+<title>Color #£FixName£#</title>
+
+<link href="css.css" rel="stylesheet" type="text/css">
+<link rel="ICON" type="image" href="http://rbwork.fr/img/Icone.ico" />
+<script src="colorpicker.min.js"></script>
+<style type="text/css">
+</style>
+</head>
+<body>
+<a href="/" class="button back">Home</a>
+<a href="/rainbow" class="button back" style="top: 100px;">Rainbow</a>
+<section>
+    <h1>Color #£FixName£#</h1>
+</section>
+<canvas id="picker"></canvas><br>
+        <input id="color" value="rgb(#£String(colorR)£#, #£String(colorG)£#, #£String(colorB)£#)">
+<section>
+  <h1>Strobe</h1>
+  <div class="block">
+    <h1>Freq</h1>
+    <input oninput="chstrob()" class="slider" id="strobe" type="range" min="0" max="50" value="0" step=".1"><br><h1 id="strobeV">0hz</h1>
+  </div>
+  <div class="block">
+    <h1>Duty</h1>
+    <input oninput="chstrob()" class="slider" id="duty" type="range" min="1" max="100" value="50"><br><h1 id="dutyV">50%</h1>
+  </div>
+  <div class="block">
+    <h1>brightness</h1>
+    <input oninput="chstrob()" class="slider" id="bright" type="range" min="0" max="255" value="#String(Bright)#" step="1"><br><h1 id="brightV"> #£String(Bright)£#</h1>
+  </div>
+</section>
+
+
+
+<section>
+  <a onclick="setColor()" class="button">Save color</a>
+</section>
+<section>
+  <a onclick="coloroff()" class="button">Disable Color</a>
+</section>
+
+#£syncSection£#
+
+<div onclick="clearbox()" id="popbox" class="pop" style="display: none;">
+  <h2 id="poptext">Universe</h2>
+</div>
+
+<script type="text/javascript">
+var strobe = document.getElementById("strobe");
+var duty = document.getElementById("duty");
+var strobeV = document.getElementById("strobeV");
+var dutyV = document.getElementById("dutyV");
+var bright = document.getElementById("bright");
+var brightV = document.getElementById("brightV");
+
+var popbox = document.getElementById("popbox");
+var colorbox = document.getElementById("colorbox");
+
+var colorPicker =new KellyColorPicker({place : 'picker', input : 'color', size : 400});
+
+var syncBox = document.getElementById("SyncBox");
+var syncCheck = document.getElementsByClassName("checkboxS");
+
+function syncMessage() {
+  checkMessage = "";
+  for (var i = 0; i < syncCheck.length; i++) {
+    checkMessage += syncCheck[i].id +"=";
+    if (syncCheck[i].checked == true) {
+      checkMessage+= "1;";
+    } else {checkMessage+= "0;";}
+  }
+  return checkMessage;
+}
+
+window.onload = function(){
+  popbox.style.display = "none";
+};
+
+function chcolor() {
+colorbox.style.backgroundColor="rgb("+red.value+", "+green.value+", "+blue.value+")";
+redV.innerHTML = red.value;
+greenV.innerHTML = green.value;
+blueV.innerHTML = blue.value;
+}
+function chstrob() {
+strobeV.innerHTML = strobe.value+"hz";
+dutyV.innerHTML = duty.value+"%";
+brightV.innerHTML = bright.value;
+}
+
+function clearbox() {popbox.style.display = "none";}
+function setColor(){
+    var colorpick = colorPicker.getCurColorRgb();
+    var message = "";
+    message = "R="+colorpick.r;
+    message += ";G="+colorpick.g;
+    message += ";B=" + colorpick.b;
+    message += ";st=" + strobe.value;
+    message += ";duty=" + duty.value;
+    message += ";bright=" + bright.value;
+    message += ";"+syncMessage();
+    console.log(message);
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+          setTimeout(clearbox, 5000);
+        };
+      };
+    xhttp.open("POST","/setColor", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send(message);
+}
+function coloroff(){
+    var message = "Color=0";
+    message += ";"+syncMessage();
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          popbox.style.display = "block";
+          document.getElementById("poptext").innerHTML = this.responseText;
+        };
+      };
+    xhttp.open("POST","/Coloroff", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send(message);
+}
+</script>
+</body></html>
+
+
+
