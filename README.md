@@ -22,3 +22,5 @@ have some shortcut for freezing ( f ), turning black ( b )
 changing the gamma with + and -
 cycling between the connected display ( * )
 changing the position / scale of the mapper ( 1 , 2 , 3 )
+
+![artnet](https://user-images.githubusercontent.com/13667769/115789069-d22cc900-a3c4-11eb-8ee3-3f67adc98232.gif)
