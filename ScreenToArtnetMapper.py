@@ -174,7 +174,8 @@ while True:
    LedBuffer = mapperExtract(frame,PentaMapping)
    artnetPacket = pack_artnet_packet(10,0,3,LedBuffer)
    sock.sendto(artnetPacket, ("192.168.0.103", UDP_PORT))
-
+   if cv.getWindowProperty("ScreenToArnet", cv.WND_PROP_VISIBLE) <1:
+      break
    k = cv.waitKey(1);
    if(k == 27) or (k == ord("q")):
      break
